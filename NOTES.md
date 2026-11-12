@@ -10,8 +10,28 @@ The `docline` skill captures a habit: every new function gets a one-line JSDoc c
 I added `/summarize-changes` (`.claude/commands/summarize-changes.md`). It gathers the working-tree status, the uncommitted diff, the branch's commits and the diff against `main` (or a base branch passed as an argument), then writes a short summary with an overview, changes by area, uncommitted work and risks. It's worth a shortcut because I would otherwise retype the same four git commands and the same output structure before every commit or PR. It can only run `git status`, `git diff` and `git log`, so it can't change anything.
 
 ## Hook
-The hook runs on the `PostToolUse` event, matched to `Edit|Write`, so it reacts after a file has been changed. It can't prevent anything. `.claude/hooks/boo.js` finds the functions touched by the edit and appends `BOOO!` to their one-line doc comments. It's idempotent, so repeated edits don't stack the tag.
+The hook runs on the `PostToolUse` event, matched to `Edit|Write`, so it reacts after a file has been changed. `.claude/hooks/check-standards.js` checks the edited file against the standards in `CLAUDE.md`: it runs ESLint with the project config, and in `routes/` it flags error responses that aren't `.json({ error: '...' })` and route files that hold state instead of using `db/store.js`. On a failure it exits with code 2 and prints the problems, so Claude sees them and fixes them. It never edits files. It only looks at `.js` files in `server.js`, `routes/`, `db/` and `tests/`.
 
 ## Headless
-I run a commanf to add a docline to all functions. It required adding write access.
+**Task:** summarize what changed on the branch against `main`, using the `/summarize-changes` command. It is read-only, so it is safe to run unattended (for example in CI).
 
+**Invocation:**
+```
+claude -p "/summarize-changes main" \
+  --allowedTools "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Read"
+```
+
+**Allowed tools and why:**
+- `Bash(git status:*)`, `Bash(git diff:*)` and `Bash(git log:*)`: the command gathers its facts with exactly these three git commands, and nothing else is needed.
+- `Read`: lets it open changed files when the diff stats aren't enough to explain a change.
+
+Nothing else is allowed. There is no `Edit`, `Write`, general `Bash`, or network access, so a headless run can't change files, commit, push or call out. In `-p` mode any tool not on the list is denied instead of prompting. The run compared against `main` and reported the uncommitted work correctly, which also shows the base-branch argument reaches the git commands.
+
+## Changes
+Changes on `feature/new-work`, compared with `main`:
+- `.mcp.json`: adds the `fetch` MCP server.
+- `.claude/settings.json`: allows `mcp__fetch__fetch` and registers the `PostToolUse` hook.
+- `.claude/skills/docline/SKILL.md`: the `docline` skill.
+- `.claude/commands/summarize-changes.md`: the `/summarize-changes` command, which takes an optional base branch.
+- `.claude/hooks/check-standards.js`: the standards-check hook script.
+- `NOTES.md`: these notes.

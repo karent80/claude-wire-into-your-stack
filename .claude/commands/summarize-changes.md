@@ -4,20 +4,20 @@ allowed-tools: Bash(git status:*), Bash(git diff:*), Bash(git log:*)
 argument-hint: [base-branch]
 ---
 
-Summarize what changed. Compare against `$ARGUMENTS` if given, otherwise against `main`.
+Summarize what changed.
 
-## Context
+The base branch is `$ARGUMENTS`. If that is empty, use `main`. Call it BASE below. If BASE starts with `-`, stop and say it isn't a valid branch name.
 
-- Working tree: !`git status --short`
-- Uncommitted diff: !`git diff HEAD --stat`
-- Commits on this branch: !`git log --oneline ${ARGUMENTS:-main}..HEAD`
-- Branch diff: !`git diff ${ARGUMENTS:-main}...HEAD --stat`
+Run these git commands, substituting BASE for the base branch:
 
-## Output
+1. `git status --short`
+2. `git diff HEAD --stat`
+3. `git log --oneline BASE..HEAD`
+4. `git diff BASE...HEAD --stat`
 
 Read the actual diffs where the stats aren't enough, then reply with:
 
-1. **Overview**: one or two sentences on the purpose of the changes.
+1. **Overview**: one or two sentences on the purpose of the changes, and which base you compared against.
 2. **Changes**: a short bullet list grouped by area (routes, db, tests, config), naming the files.
 3. **Uncommitted**: anything not yet committed, or "none".
 4. **Watch out for**: risks, missing tests, or loose ends. Omit if there are none.
