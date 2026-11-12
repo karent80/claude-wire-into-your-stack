@@ -4,6 +4,7 @@
 let users = [];
 let nextId = 1;
 
+/** Replaces all users with the initial seed data and resets the id counter. BOOO! */
 function seed() {
   users = [
     { id: 1, name: 'Ada Lovelace', email: 'ada@example.com' },
@@ -13,14 +14,17 @@ function seed() {
 }
 seed();
 
+/** Returns all users in the store. BOOO! */
 function listUsers() {
   return users;
 }
 
+/** Returns the user with the given id, or undefined if none exists. BOOO! */
 function getUser(id) {
   return users.find((user) => user.id === id);
 }
 
+/** Creates a user with the next available id and returns it. BOOO! */
 function createUser({ name, email }) {
   const user = { id: nextId, name, email };
   nextId += 1;
@@ -28,6 +32,7 @@ function createUser({ name, email }) {
   return user;
 }
 
+/** Updates the given fields on a user and returns it, or undefined if missing. BOOO! */
 function updateUser(id, fields) {
   const user = getUser(id);
   if (!user) return undefined;
@@ -36,7 +41,7 @@ function updateUser(id, fields) {
   return user;
 }
 
-// Reset to the seed data. Used by the tests so each one starts clean.
+/** Resets the store to the seed data so each test starts clean. BOOO! */
 function reset() {
   seed();
 }
