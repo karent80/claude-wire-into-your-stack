@@ -13,4 +13,5 @@ I added `/summarize-changes` (`.claude/commands/summarize-changes.md`). It gathe
 The hook runs on the `PostToolUse` event, matched to `Edit|Write`, so it reacts after a file has been changed. It can't prevent anything. `.claude/hooks/boo.js` finds the functions touched by the edit and appends `BOOO!` to their one-line doc comments. It's idempotent, so repeated edits don't stack the tag.
 
 ## Headless
-I haven't run anything headless yet, so there is nothing to report and nothing locked down. A first headless run would use `claude -p` with a narrow `--allowedTools` list, for example read-only git commands for `/summarize-changes`.
+I run a commanf to add a docline to all functions. It required adding write access.
+
